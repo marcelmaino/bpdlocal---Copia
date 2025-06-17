@@ -1,0 +1,42 @@
+# Dockerfile de produção para o backend
+FROM node:18-alpine
+
+# Instalar dumb-init para gerenciamento de processos
+RUN apk add --no-cache dumb-init
+
+# Criar usuário não-root para segurança
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY package*.json ./
+
+# Instalar apenas dependências de produção
+RUN npm ci --only=production && npm cache clean --force
+
+# Copiar código fonte
+COPY . .
+
+# Criar diretório de logs
+RUN mkdir -p logs && chown -R nodejs:nodejs /app
+
+# Mudar para usuário não-root
+USER nodejs
+
+# Expor porta
+EXPOSE 5000
+
+# Variáveis de ambiente
+ENV NODE_ENV=production
+ENV PORT=5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node healthcheck.js
+
+# Comando para iniciar a aplicação
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "server.js"]

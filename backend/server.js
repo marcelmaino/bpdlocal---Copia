@@ -46,6 +46,16 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'Backend funcionando' });
 });
 
+// Health check para produção
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'Backend funcionando',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 // Login simples
 app.post('/login', (req, res) => {
   const { playerName, password } = req.body;

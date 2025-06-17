@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # Frontend React + Vite
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=http://backend:5000
+    depends_on:
+      - backend
+    networks:
+      - bpd-network
+    restart: unless-stopped
+
+  # Backend Node.js
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_USER=bpd_user
+      - DB_PASSWORD=bpd_password_2024
+      - DB_NAME=bpd_database
+      - JWT_SECRET=your_jwt_secret_here_change_in_production
+      - CORS_ORIGIN=http://localhost
+    depends_on:
+      - mysql
+    networks:
+      - bpd-network
+    restart: unless-stopped
+    volumes:
+      - ./backend/logs:/app/logs
+
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_2024
+      MYSQL_DATABASE: bpd_database
+      MYSQL_USER: bpd_user
+      MYSQL_PASSWORD: bpd_password_2024
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - bpd-network
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+
+  # phpMyAdmin (opcional para produção)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: bpd_user
+      PMA_PASSWORD: bpd_password_2024
+      UPLOAD_LIMIT: 100M
+      MEMORY_LIMIT: 512M
+      MAX_EXECUTION_TIME: 300
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    volumes:
+      - ./phpmyadmin-config.ini:/usr/local/etc/php/conf.d/phpmyadmin-config.ini:ro
+      - ./phpmyadmin-apache.conf:/etc/apache2/sites-available/000-default.conf:ro
+    networks:
+      - bpd-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (opcional)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - bpd-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  bpd-network:
+    driver: bridge
