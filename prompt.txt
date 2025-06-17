@@ -1,0 +1,217 @@
+
+
+-Sistema de Dashboard para Controle de Eficiência e Gestão Financeira de Poker
+
+
+
+-- Visão Geral do Sistema
+
+Desenvolver um dashboard web completo para gerenciamento de performance e controle financeiro de jogadores, agentes e clubes de poker. O sistema terá interface responsiva com dois níveis de acesso distintos e visualização de dados em tempo real. Terá gráficos e análises por ia para complementar 
+Vamos utilizar docker para desenvolvimento local e produção.
+
+
+
+
+
+-- Tipos de Usuários e Autenticação
+
+ Admin (Administrador) 
+Acesso completo a todos os dados 
+
+Visualização de todos os jogadores, agentes e clubes 
+
+Capacidade de aplicar todos os filtros disponíveis 
+
+Acesso a relatórios consolidados 
+
+login:admin, senha: adm121456
+este usuário pode ser incluido como padrão 
+
+
+Jogador
+Acesso restrito apenas aos seus próprios dados
+Login usando a coluna "playerName" da base de dados
+Senha padrão: Primeira letra do nome em maiúscula + "2025" + últimos 4 caracteres do playerName
+Exemplo: João Silva → login: "João Silva", senha: "J2025ilva"
+Visualização limitada aos seus resultados pessoais;
+fazer o select e agrupar informações de um único usuário por login;
+
+Script para a criação de uma tabela de usuários distinta com os dados de login e senha padrão com base nos registros da coluna playerName.
+
+
+utulizar auth.js para facilitar 
+
+
+
+
+
+
+--Layout e Componentes do Dashboard 
+cor background: #f5f7fa 
+estilo moderno mas organização clássica de dashboard 
+Header (Topo) + Menu Menu de navegação lateral contraido com 64 pixels mostrando o logo do sistema ocupando sempre 100% da altura; utilize o svg abaixo como logo do sistema:
+
+
+<?xml version="1.0" standalone="no"?>
+
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+
+ width="576.000000pt" height="720.000000pt" viewBox="0 0 576.000000 720.000000"
+
+ preserveAspectRatio="xMidYMid meet">
+
+<g transform="translate(0.000000,720.000000) scale(0.100000,-0.100000)"
+
+fill="#000000" stroke="none">
+
+<path d="M10 4620 l0 -2580 510 0 510 0 0 308 0 307 1065 406 1064 405 233
+
+-141 c677 -410 947 -623 1117 -881 113 -171 157 -308 168 -519 9 -196 -18
+
+-350 -89 -505 -134 -291 -400 -460 -846 -538 -88 -15 -267 -17 -1917 -22
+
+l-1820 -5 -3 -428 -2 -428 1862 4 c1940 4 1899 3 2178 48 557 89 969 276 1265
+
+575 209 211 343 468 411 788 22 103 27 155 31 351 6 262 -7 397 -56 587 -140
+
+544 -526 960 -1333 1441 -76 45 -138 84 -138 87 0 3 30 21 67 39 168 82 403
+
+233 560 360 128 103 310 292 396 412 77 107 184 316 223 434 51 154 65 247 71
+
+455 5 217 -6 328 -52 485 -64 221 -162 385 -329 551 -350 349 -895 535 -1681
+
+574 -127 6 -853 10 -1837 10 l-1628 0 0 -2580z m3600 1706 c497 -72 749 -240
+
+842 -561 32 -114 32 -332 0 -453 -90 -337 -359 -591 -864 -819 -97 -43 -2534
+
+-963 -2553 -963 -3 0 -5 635 -5 1411 l0 1410 1228 -3 c1119 -4 1238 -5 1352
+
+-22z"/>
+
+</g>
+
+</svg>
+
+                                                      
+
+ícones de navegação com o menu fechado e quando abre icone e texto. 
+página gráficos 
+
+Header - Seletor de intervalo de datas com opções: (esta seleção que comanda o intervalo de tempo para os dados mostrados no dashboard) "Semana Atual" (padrão) selecionado quando entra (COMEÇANDO SEMPRE NA SEGUNDA ATÉ O DIA ATUAL) Botão "Hoje" "Última semana" (começando na segunda e terminando no domingo) "Últimos 30 dias" "Intervalo personalizado" (com calendário date picker) Seletor de moeda: Toggle entre Real (R) e Dólar (US) e ambas as moedas(ambas selecionada por padrão) Informações do usuário logado e botão de logout 
+
+
+
+-- Cards de Métricas (Primeira Linha) Cinco cards principais exibindo: Total de Mãos Jogadas Campo: hands Ícone: cartas de baralho Cor: azul Ganhos Campos: wins (filtrado por moeda) Ícone: cifrão Cor: verde Formato: moeda selecionada Taxas Campos: realFee ou dolarFee (baseado na seleção de moeda) Ícone: porcentagem Cor: amarelo Formato: moeda selecionada Rakeback Campos: realRakeback ou dolarRakeback Ícone: moedas empilhadas Cor: roxo Formato: moeda selecionada Balanço Final Cálculo: Ganhos - Taxas + Rakeback Ícone: gráfico de linha Cor: verde se positivo, vermelho se negativo Formato: moeda selecionada 
+
+
+-Seção de Filtros (Segunda Linha com opção de esconder e mostrar quando necessário) Barra de pesquisa global Placeholder: "Pesquisar jogador, agente, clube..." Autocomplete com sugestões após 2 caracteres Busca nas colunas: "playerName", "agentName", "club" Filtro por Clube Dropdown com lista de todos os clubes únicos Opção "Todos os Clubes" Multi-seleção disponível Busca em:  club Filtro por Agente Dropdown com lista de todos os agentes únicos Opção "Todos os Agentes" Multi-seleção disponível Busca em: agentName Botão "Limpar Filtros" Remove todos os filtros aplicados Ícone: X em círculo IMPORTANTE: Opção de selecionar mais de um clube/agente/jogador ao filtrar. 
+
+--5 Análise de Performance com IA card com largura 100% Insights automáticos baseados nos dados: "Seu melhor desempenho foi no clube X" "Você tem 15% mais ganhos às quartas-feiras" "Sua taxa de vitória aumentou 8% este mês" Recomendações: Sugestões de melhoria baseadas em padrões Alertas sobre variações significativas Previsões: Projeção de ganhos para os próximos 7 dias Tendências identificadas 
+
+
+- - Tabela de Registros Completa Para o frontend das tabelas utilizar o componente datatables (datatables.net) Funcionalidades da tabela: Exibe todas as colunas menos a "linha_id" Recursos avançados: Ordenação por qualquer coluna (clique no header) Busca dentro da tabela Exportar para PDF OU EXCEL dentro do período selecionado Paginação com opções: 10, 50, 100, 1000, "Todos" Altura da tabela ajustável dinamicamente Seleção de colunas visíveis Agrupamento por jogador/clube/agente Totalizadores no rodapé utilizar as opções do datatable para aplicar estas funcionalidades.  
+
+
+
+Página Quadro de Desempenho Geral Container com abas para diferentes visualizações largura 100%: Aba 1: Gráficos Gráfico de linha: Evolução do balanço ao longo do tempo Gráfico de barras: Comparação de ganhos vs taxas por período Gráfico de pizza: Distribuição de mãos por clube Gráfico de área: Volume de jogos por dia da semana Geração de gráficos personalisados Aba 2: Métricas Taxa de vitória (win rate) ROI (Return on Investment) Média de ganhos por mão Total de horas jogadas (se disponível) 
+
+
+
+ Especificações Técnicas 
+
+ Frontend Framework: React.js com TypeScript 
+UI: shadcn  com tailwind v4 
+Gráficos: Chart.js  Estilização: CSS-in-JS (styled-components) 
+Tabelas: DataTables completo (npm install datatables.net-dt)  
+Backend Node.js 
+Banco de Dados MySQL.
+tabela dentro da tabela bpd: 
+
+linha_id; 
+
+dia; 
+
+reference;
+
+share; 
+
+moeda; 
+
+upline; 
+
+club; 
+
+playerId; 
+
+playerName; 
+
+agentName; 
+
+agentId; 
+
+superAgentName; 
+
+superagentId; 
+
+localWins; 
+
+localFee; 
+
+hands; 
+
+dolarWins; 
+
+dolarFee; 
+
+dolarRakeback;
+
+dolarRebate; 
+
+realWins; 
+
+realFee; 
+
+realRakeback; 
+
+realRebate;
+
+realAgentSett; 
+
+dolarAgentSett; 
+
+realRevShare; 
+
+realBPFProfit; 
+
+deal; 
+
+rebate; 
+
+
+
+Segurança Senhas hasheadas com bcrypt 
+
+CORS configurado adequadamente 
+
+HTTPS obrigatório em produção
+
+
+Fluxo de Dados
+Login: Usuário acessa com playerName + senha padrão
+Carregamento inicial: Dashboard carrega dados da semana atual
+Aplicação de filtros: Atualização em tempo real dos cards e gráficos
+Interações: Cliques em gráficos mostram detalhes específicos
+Exportação: Dados podem ser baixados em formatos diversos
+
+
+Responsividade
+Desktop: Layout completo com todos os elementos visíveis
+Tablet: Cards em grid 2x2, gráficos empilhados
+Mobile: Cards em coluna única, menu hambúrguer para filtros
+
+
+Performance Lazy loading para a tabela de registros   Este dashboard proporcionará uma visão completa e intuitiva dos dados de poker, permitindo análises detalhadas e tomada de decisão baseada em dados para todos os envolvidos no ecossistema.

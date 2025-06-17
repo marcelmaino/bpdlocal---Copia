@@ -1,0 +1,10 @@
+FROM phpmyadmin/phpmyadmin:latest
+
+# Copiar arquivo de configuração do Apache
+COPY phpmyadmin-apache.conf /etc/apache2/conf-available/uploads.conf
+
+# Ativar configurações personalizadas do Apache
+RUN a2enconf uploads
+
+# Expor porta
+EXPOSE 80
