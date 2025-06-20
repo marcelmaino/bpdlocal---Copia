@@ -86,7 +86,7 @@ const LoginPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-600 hover:text-gray-600"
                     disabled={isLoading}
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -96,7 +96,7 @@ const LoginPage = () => {
 
               <Button 
                 type="submit" 
-                className="w-full bg-bpd-primary hover:bg-bpd-primary/90"
+                className="w-full bg-blue-600 hover:bg-bpd-primary/90 text-white"
                 disabled={isLoading || !username.trim() || !password.trim()}
               >
                 {isLoading ? (
@@ -117,7 +117,7 @@ const LoginPage = () => {
               <div className="border-t pt-4">
                 <p className="font-medium mb-2">Credenciais de acesso:</p>
                 <div className="space-y-1 text-xs">
-                  <p><strong>Admin:</strong> admin / adm121456bpd</p>
+                  <p><strong>Admin:</strong> admin / admin123</p>
                   <p><strong>Jogador:</strong> Nome do jogador / Primeira letra + "2025" + últimos 4 caracteres</p>
                 </div>
               </div>

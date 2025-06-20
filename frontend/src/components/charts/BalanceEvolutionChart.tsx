@@ -19,8 +19,8 @@ interface BalancePoint {
 interface BalanceEvolutionData {
   data: BalancePoint[]
   totalGrowth: number
-  bestDay: BalancePoint
-  worstDay: BalancePoint
+  bestDay: BalancePoint | null
+  worstDay: BalancePoint | null
 }
 
 const BalanceEvolutionChart = () => {
@@ -234,7 +234,7 @@ const BalanceEvolutionChart = () => {
                   <YAxis 
                     stroke="#6B7280"
                     fontSize={12}
-                    tickFormatter={(value) => formatCurrency(value, currency === 'BOTH' ? 'BRL' : currency, true)}
+                    tickFormatter={(value) => formatCurrency(value, currency === 'BOTH' ? 'BRL' : currency)}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Area
@@ -257,7 +257,7 @@ const BalanceEvolutionChart = () => {
                   <YAxis 
                     stroke="#6B7280"
                     fontSize={12}
-                    tickFormatter={(value) => formatCurrency(value, currency === 'BOTH' ? 'BRL' : currency, true)}
+                    tickFormatter={(value) => formatCurrency(value, currency === 'BOTH' ? 'BRL' : currency)}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Line

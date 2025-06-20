@@ -1,28 +1,28 @@
 services:
   # Backend PHP
-  backend:
+  backend-new:
     build: ./backend-php
-    container_name: bpd-backend-php
+    container_name: bpd-backend-php-new
     ports:
-      - "5000:80"
+      - "5001:80"
     environment:
-      - DB_HOST=mysql
+      - DB_HOST=mysql-new
       - DB_USER=root
       - DB_PASSWORD=root123
       - DB_NAME=bpd_database
       - DB_PORT=3306
     depends_on:
-      - mysql
+      - mysql-new
     volumes:
       - ./backend-php:/var/www/html
     restart: unless-stopped
 
   # MySQL Database
-  mysql:
+  mysql-new:
     image: mysql:8.0
-    container_name: bpd-mysql
+    container_name: bpd-mysql-new
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: bpd_database
@@ -30,21 +30,21 @@ services:
       MYSQL_PASSWORD: bpd123
       MYSQL_ROOT_HOST: '%'
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data_new:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     restart: unless-stopped
     command: --default-authentication-plugin=mysql_native_password --max_allowed_packet=67108864 --innodb_buffer_pool_size=256M
 
   # phpMyAdmin
-  phpmyadmin:
+  phpmyadmin-new:
     build:
       context: .
       dockerfile: Dockerfile.phpmyadmin
-    container_name: bpd-phpmyadmin
+    container_name: bpd-phpmyadmin-new
     ports:
-      - "8080:80"
+      - "8081:80"
     environment:
-      PMA_HOST: mysql
+      PMA_HOST: mysql-new
       PMA_USER: root
       PMA_PASSWORD: root123
       UPLOAD_LIMIT: 50M
@@ -53,12 +53,12 @@ services:
     volumes:
       - ./phpmyadmin-config.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
     depends_on:
-      - mysql
+      - mysql-new
     restart: unless-stopped
 
 volumes:
-  mysql_data:
+  mysql_data_new:
 
 networks:
   default:
-    name: bpd-network
+    name: bpd-network-new

@@ -274,7 +274,7 @@ const GainsVsFeesChart = () => {
                   <YAxis 
                     stroke="#6B7280"
                     fontSize={12}
-                    tickFormatter={(value) => formatCurrency(value, currency === 'BOTH' ? 'BRL' : currency, true)}
+                    tickFormatter={(value) => formatCurrency(value, currency === 'BOTH' ? 'BRL' : currency)}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
